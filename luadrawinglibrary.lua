@@ -954,20 +954,16 @@ getgenv().isrenderobj = newcclosure(function(drawingObj)
     return isrenderobj
 end)
 
-getgenv().getrenderproperty = newcclosure(function(drawingObj, property)
-    assert(drawingObj[property] ~= nil, tostring(property) .. " is not a valid property of " .. tostring(drawingObj), 2)
-    local success, drawingProperty = pcall(function()
-        return drawingObj[property]
-    end)
-    if drawingProperty ~= nil and success then
-        return drawingProperty
-    end
-    return error("Couldn't get the render property: " .. drawingProperty)
+getgenv().getrenderproperty = newcclosure(function(thing, prop)
+    return thing[prop]
 end)
 
-getgenv().setrenderproperty = newcclosure(function(drawingObj, property, value)
-    assert(getrenderproperty(drawingObj, property), tostring(property) .. " is not a valid property of " .. tostring(drawingObj), 2)
-    drawingObj[property]  = value
+getgenv().setrenderproperty = newcclosure(function(thing, prop, val)
+	local success, err = pcall(function()
+		thing[prop] = val
+	end)
+
+	if not success and err then warn(err) end
 end)
 
 getgenv().cleardrawcache = newcclosure(function()
