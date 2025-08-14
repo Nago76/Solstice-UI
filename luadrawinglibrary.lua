@@ -972,14 +972,6 @@ getgenv().cleardrawcache = newcclosure(function()
         assert(suc and not err, "Error cleaning the DrawingLib cache: " .. tostring(err), 2)
     end
 end)
-getgenv().getcustomasset = newcclosure(function(fff)
-			local content = readfile(fff)
-	if content then
-		return "rbxasset://" .. content
-	else
-		return ""
-	end
-end
 
 
 Drawing = getgenv().Drawing
@@ -987,6 +979,5 @@ cleardrawcache = getgenv().cleardrawcache
 setrenderproperty = getgenv().setrenderproperty
 getrenderproperty = getgenv().getrenderproperty
 isrenderobj = getgenv().isrenderobj
-getcustomasset = getgenv().getcustomasset
 
 
