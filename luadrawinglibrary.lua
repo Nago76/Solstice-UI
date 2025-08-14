@@ -973,8 +973,54 @@ getgenv().cleardrawcache = newcclosure(function()
     end
 end)
 
+local function getc(str)
+	local sum = 0
+	for i = 1, #str do
+		sum = (sum + string.byte(str, i)) % 256
+	end
+	return sum
+end
+getgenv().crypt.encrypt = newcclosure(function(data, key, iv, mode)
+  mode = mode or "CBC"
+  iv   = iv   or crypt.generatebytes(16)
+
+  local byteChange = (getc(mode) + getc(iv) + getc(key)) % 256
+  local res = {}
+
+  for i = 1, #data do
+    res[i] = string.char((string.byte(data, i) + byteChange) % 256)
+  end
+
+  return crypt.base64encode(table.concat(res)), iv
+end)
+
+getgenv().crypt.decrypt = newcclosure(function(data, key, iv, mode)
+  mode = mode or "CBC"
+
+  local decoded    = crypt.base64decode(data)
+  local byteChange = (getc(mode) + getc(iv) + getc(key)) % 256
+  local res = {}
+
+  for i = 1, #decoded do
+    res[i] = string.char((string.byte(decoded, i) - byteChange) % 256)
+  end
+
+  return table.concat(res)
+end)
+
 Drawing = getgenv().Drawing
 cleardrawcache = getgenv().cleardrawcache
 setrenderproperty = getgenv().setrenderproperty
 getrenderproperty = getgenv().getrenderproperty
 isrenderobj = getgenv().isrenderobj
+
+crypt.base64encode = base64encode
+crypt.base64decode = base64decode
+crypt.base64_encode = base64encode
+crypt.base64_decode = base64decode
+base64 = {encode = base64encode, decode = base64decode}
+crypt.base64 = base64
+crypt.generatebytes = crypt_generatebytes
+crypt.generatekey = crypt_generatekey
+crypt.hash = crypt_hash
+getgenv().crypt = crypt
